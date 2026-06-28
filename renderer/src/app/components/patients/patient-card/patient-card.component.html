@@ -1,0 +1,20 @@
+<div class="p-card">
+  <div class="p-avatar">{{ initials() }}</div>
+  <div class="p-info">
+    <div class="p-name">{{ patient().firstName }} {{ patient().lastName }}</div>
+    <div class="p-detail">{{ patient().email }}</div>
+    @if (patient().phone) {
+      <div class="p-detail">{{ patient().phone }}</div>
+    }
+    <div class="p-meta">
+      Né(e) le {{ birthDate() }}
+      @if (patient()._count) {
+        &nbsp;· {{ patient()._count!.medicalRecords }} dossier(s)
+      }
+    </div>
+  </div>
+  <div class="p-actions">
+    <button class="btn btn-ghost btn-icon" (click)="edit.emit(patient())" title="Modifier">✏️</button>
+    <button class="btn btn-danger btn-icon" (click)="delete.emit(patient().id)" title="Supprimer">🗑️</button>
+  </div>
+</div>

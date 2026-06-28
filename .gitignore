@@ -1,0 +1,10 @@
+node_modules/
+dist/
+renderer/node_modules/
+renderer/dist/
+renderer/.angular/
+renderer-dist/
+prisma/dev.db
+prisma/dev.db-journal
+.env
+*.js.map

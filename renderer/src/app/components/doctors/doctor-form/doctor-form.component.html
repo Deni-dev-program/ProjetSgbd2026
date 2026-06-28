@@ -1,0 +1,68 @@
+<div class="modal-overlay" (click)="onOverlayClick($event)">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ editing() ? 'Modifier' : 'Nouveau' }} médecin</h2>
+      <button class="close-btn" (click)="cancel.emit()">✕</button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="modal-body">
+        @if (errorMsg()) {
+          <div class="form-error-banner">
+            ⚠️ {{ errorMsg() }}
+          </div>
+        }
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Prénom *</label>
+            <input formControlName="firstName" placeholder="Martin" />
+            @if (form.get('firstName')?.invalid && form.get('firstName')?.touched) {
+              <span class="error-msg">Prénom requis</span>
+            }
+          </div>
+          <div class="form-group">
+            <label>Nom *</label>
+            <input formControlName="lastName" placeholder="Dupont" />
+            @if (form.get('lastName')?.invalid && form.get('lastName')?.touched) {
+              <span class="error-msg">Nom requis</span>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Email *</label>
+          <input formControlName="email" type="email" placeholder="m.dupont@clinique.be" />
+          @if (form.get('email')?.invalid && form.get('email')?.touched) {
+            <span class="error-msg">Email valide requis</span>
+          }
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Téléphone</label>
+            <input formControlName="phone" placeholder="+32 2 000 00 00" />
+          </div>
+          <div class="form-group">
+            <label>Département *</label>
+            <select formControlName="departmentId">
+              <option value="">-- Choisir --</option>
+              @for (dept of deptService.departments(); track dept.id) {
+                <option [value]="dept.id">{{ dept.name }}</option>
+              }
+            </select>
+            @if (form.get('departmentId')?.invalid && form.get('departmentId')?.touched) {
+              <span class="error-msg">Département requis</span>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" (click)="cancel.emit()">Annuler</button>
+        <button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving()">
+          {{ saving() ? 'Enregistrement…' : (editing() ? 'Mettre à jour' : 'Créer') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

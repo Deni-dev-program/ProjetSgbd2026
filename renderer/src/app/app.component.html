@@ -1,0 +1,47 @@
+<div class="app-layout" [class.sidebar-collapsed]="!sidebarOpen()">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <span class="logo-icon">⚕️</span>
+        @if (sidebarOpen()) {
+          <span class="logo-text">ClinicFlow</span>
+        }
+      </div>
+      <button class="toggle-btn" (click)="toggleSidebar()" title="Toggle sidebar">
+        {{ sidebarOpen() ? '◀' : '▶' }}
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      @for (item of navItems; track item.path) {
+        <a
+          class="nav-item"
+          [routerLink]="item.path"
+          routerLinkActive="active"
+          [title]="item.label"
+        >
+          <span class="nav-icon">{{ item.icon }}</span>
+          @if (sidebarOpen()) {
+            <span class="nav-label">{{ item.label }}</span>
+          }
+        </a>
+      }
+    </nav>
+  </aside>
+
+  <!-- Contenu principal -->
+  <main class="main-content">
+    <router-outlet />
+  </main>
+
+</div>
+
+@if (patientUi.showForm()) {
+  <app-patient-form
+    [editing]="patientUi.editingPatient()"
+    (saved)="onPatientSaved()"
+    (cancel)="patientUi.closeForm()"
+  />
+}

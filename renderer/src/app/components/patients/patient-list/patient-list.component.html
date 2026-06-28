@@ -1,0 +1,42 @@
+<div class="page">
+  <div class="plist-header">
+    <div>
+      <h1>Patients</h1>
+      <p class="subtitle">{{ filteredPatients().length }} patient(s) trouvé(s)</p>
+    </div>
+    <div class="plist-actions">
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input [(ngModel)]="searchTerm" placeholder="Rechercher un patient…" />
+      </div>
+      <button class="btn btn-primary" (click)="openCreate()">
+        ＋ Nouveau patient
+      </button>
+    </div>
+  </div>
+
+  @if (patientService.loading()) {
+    <div class="loading">Chargement des patients…</div>
+  } @else if (filteredPatients().length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">🧑‍⚕️</div>
+      <h3>Aucun patient trouvé</h3>
+      <p>{{ searchTerm ? 'Aucun résultat pour "' + searchTerm + '"' : 'Ajoutez votre premier patient.' }}</p>
+      @if (!searchTerm) {
+        <button class="btn btn-primary" style="margin-top: 16px;" (click)="openCreate()">
+          ＋ Ajouter un patient
+        </button>
+      }
+    </div>
+  } @else {
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+      @for (p of filteredPatients(); track p.id) {
+        <app-patient-card
+          [patient]="p"
+          (edit)="openEdit($event)"
+          (delete)="onDelete($event)"
+        />
+      }
+    </div>
+  }
+</div>

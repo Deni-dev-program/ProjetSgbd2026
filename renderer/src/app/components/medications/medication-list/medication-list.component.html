@@ -1,0 +1,110 @@
+<div class="page">
+  <div class="plist-header">
+    <div>
+      <h1>Médicaments</h1>
+      <p class="subtitle">{{ filteredMedications().length }} médicament(s)</p>
+    </div>
+    <div class="plist-actions">
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input [(ngModel)]="searchTerm" placeholder="Rechercher un médicament…" />
+      </div>
+      <button class="btn btn-success" (click)="openCreate()">＋ Nouveau médicament</button>
+    </div>
+  </div>
+
+  @if (medService.loading()) {
+    <div class="loading">Chargement des médicaments…</div>
+  } @else if (filteredMedications().length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">💊</div>
+      <h3>Aucun médicament</h3>
+      <p>{{ searchTerm ? 'Aucun résultat.' : 'Ajoutez votre premier médicament.' }}</p>
+    </div>
+  } @else {
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Médicament</th>
+            <th>Forme pharmaceutique</th>
+            <th>Description</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (med of filteredMedications(); track med.id) {
+            <tr>
+              <td>
+                <div class="med-cell">
+                  <span class="med-icon">💊</span>
+                  <div style="font-weight: 600;">{{ med.name }}</div>
+                </div>
+              </td>
+              <td>
+                <span class="dosage-badge">{{ med.dosageForm }}</span>
+              </td>
+              <td style="color: var(--text-secondary); font-size: 12px; max-width: 250px;">
+                {{ med.description ?? '—' }}
+              </td>
+              <td>
+                <div style="display: flex; gap: 4px;">
+                  <button class="btn btn-ghost btn-icon" (click)="openEdit(med)" title="Modifier">✏️</button>
+                  <button class="btn btn-danger btn-icon" (click)="onDelete(med.id)" title="Supprimer">🗑️</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+@if (showForm()) {
+  <div class="modal-overlay" (click)="onOverlayClick($event)">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>{{ editingMed() ? 'Modifier le médicament' : 'Nouveau médicament' }}</h2>
+        <button class="close-btn" (click)="closeForm()">✕</button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Nom *</label>
+            <input formControlName="name" placeholder="Ex: Amoxicilline 500mg" />
+            @if (form.get('name')?.invalid && form.get('name')?.touched) {
+              <span class="error-msg">Nom requis</span>
+            }
+          </div>
+          <div class="form-group">
+            <label>Forme pharmaceutique *</label>
+            <select formControlName="dosageForm">
+              <option value="">-- Choisir --</option>
+              <option value="Comprimé">Comprimé</option>
+              <option value="Gélule">Gélule</option>
+              <option value="Sirop">Sirop</option>
+              <option value="Injectable">Injectable</option>
+              <option value="Pommade">Pommade</option>
+              <option value="Patch">Patch</option>
+              <option value="Suppositoire">Suppositoire</option>
+            </select>
+            @if (form.get('dosageForm')?.invalid && form.get('dosageForm')?.touched) {
+              <span class="error-msg">Forme requise</span>
+            }
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea formControlName="description" placeholder="Indications, contre-indications…"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" (click)="closeForm()">Annuler</button>
+          <button type="submit" class="btn btn-success" [disabled]="form.invalid || saving">
+            {{ saving ? 'Enregistrement…' : (editingMed() ? 'Mettre à jour' : 'Créer') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

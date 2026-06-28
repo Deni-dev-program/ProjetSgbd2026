@@ -1,0 +1,76 @@
+<div class="page">
+  <div class="plist-header">
+    <div>
+      <h1>Médecins</h1>
+      <p class="subtitle">{{ filteredDoctors().length }} médecin(s)</p>
+    </div>
+    <div class="plist-actions">
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input [(ngModel)]="searchTerm" placeholder="Rechercher un médecin…" />
+      </div>
+      <button class="btn btn-primary" (click)="openCreate()">＋ Nouveau médecin</button>
+    </div>
+  </div>
+
+  @if (doctorService.loading()) {
+    <div class="loading">Chargement des médecins…</div>
+  } @else if (filteredDoctors().length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">👨‍⚕️</div>
+      <h3>Aucun médecin trouvé</h3>
+      <p>{{ searchTerm ? 'Aucun résultat.' : 'Ajoutez votre premier médecin.' }}</p>
+    </div>
+  } @else {
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Médecin</th>
+            <th>Email</th>
+            <th>Téléphone</th>
+            <th>Département</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (doctor of filteredDoctors(); track doctor.id) {
+            <tr>
+              <td>
+                <div class="doctor-cell">
+                  <div class="doctor-avatar">
+                    {{ doctor.firstName[0] }}{{ doctor.lastName[0] }}
+                  </div>
+                  <div>
+                    <div style="font-weight: 600;">Dr. {{ doctor.firstName }} {{ doctor.lastName }}</div>
+                  </div>
+                </div>
+              </td>
+              <td style="color: var(--text-secondary);">{{ doctor.email }}</td>
+              <td style="color: var(--text-secondary);">{{ doctor.phone ?? '—' }}</td>
+              <td>
+                @if (doctor.department) {
+                  <span class="dept-badge">{{ doctor.department.name }}</span>
+                }
+              </td>
+              <td>
+                <div style="display: flex; gap: 4px;">
+                  <button class="btn btn-ghost btn-icon" (click)="openEdit(doctor)" title="Modifier">✏️</button>
+                  <button class="btn btn-danger btn-icon" (click)="onDelete(doctor.id)" title="Supprimer">🗑️</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+@if (showForm()) {
+  <app-doctor-form
+    [editing]="editingDoctor()"
+    (saved)="onSaved()"
+    (cancel)="closeForm()"
+  />
+}

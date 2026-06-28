@@ -1,0 +1,89 @@
+<div class="page">
+  <div class="plist-header">
+    <div>
+      <h1>Rendez-vous</h1>
+      <p class="subtitle">
+        {{ appointmentService.scheduledCount() }} planifié(s) ·
+        {{ appointmentService.completedCount() }} terminé(s)
+      </p>
+    </div>
+    <div class="plist-actions">
+      <select class="filter-select" [(ngModel)]="statusFilter">
+        <option value="">Tous les statuts</option>
+        <option value="SCHEDULED">Planifiés</option>
+        <option value="COMPLETED">Terminés</option>
+        <option value="CANCELLED">Annulés</option>
+      </select>
+      <button class="btn btn-primary" (click)="openCreate()">＋ Nouveau rendez-vous</button>
+    </div>
+  </div>
+
+  @if (appointmentService.loading()) {
+    <div class="loading">Chargement des rendez-vous…</div>
+  } @else if (filteredAppointments().length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">📅</div>
+      <h3>Aucun rendez-vous</h3>
+      <p>{{ statusFilter ? 'Aucun rendez-vous avec ce statut.' : 'Ajoutez votre premier rendez-vous.' }}</p>
+    </div>
+  } @else {
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Patient</th>
+            <th>Médecin</th>
+            <th>Date</th>
+            <th>Statut</th>
+            <th>Notes</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (appt of filteredAppointments(); track appt.id) {
+            <tr>
+              <td>
+                @if (appt.patient) {
+                  <div style="font-weight: 600;">{{ appt.patient.firstName }} {{ appt.patient.lastName }}</div>
+                } @else { — }
+              </td>
+              <td>
+                @if (appt.doctor) {
+                  <div>Dr. {{ appt.doctor.firstName }} {{ appt.doctor.lastName }}</div>
+                  @if (appt.doctor.department) {
+                    <div style="font-size: 11px; color: var(--text-light);">{{ appt.doctor.department.name }}</div>
+                  }
+                } @else { — }
+              </td>
+              <td style="white-space: nowrap; color: var(--text-secondary);">
+                {{ formatDate(appt.date) }}
+              </td>
+              <td>
+                <span [class]="'badge badge-' + appt.status.toLowerCase()">
+                  {{ statusLabel(appt.status) }}
+                </span>
+              </td>
+              <td style="color: var(--text-secondary); max-width: 200px; font-size: 12px;">
+                {{ appt.notes ?? '—' }}
+              </td>
+              <td>
+                <div style="display: flex; gap: 4px;">
+                  <button class="btn btn-ghost btn-icon" (click)="openEdit(appt)" title="Modifier">✏️</button>
+                  <button class="btn btn-danger btn-icon" (click)="onDelete(appt.id)" title="Supprimer">🗑️</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+@if (showForm()) {
+  <app-appointment-form
+    [editing]="editingAppt()"
+    (saved)="onSaved()"
+    (cancel)="closeForm()"
+  />
+}

@@ -1,0 +1,52 @@
+.dept-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.dept-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  transition: box-shadow 0.2s;
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+  }
+}
+
+.dept-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.dept-body {
+  flex: 1;
+}
+
+.dept-name {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.dept-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.dept-count {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-top: 6px;
+}
+
+.dept-actions {
+  display: flex;
+  gap: 4px;
+}

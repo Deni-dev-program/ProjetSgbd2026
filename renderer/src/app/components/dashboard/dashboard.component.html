@@ -1,0 +1,82 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Tableau de bord</h1>
+      <p class="subtitle">Vue d'ensemble de la clinique</p>
+    </div>
+  </div>
+
+  @if (statsService.loading()) {
+    <div class="loading">Chargement des statistiques…</div>
+  }
+
+  @if (stats()) {
+    <div class="grid-4" style="margin-bottom: 32px">
+      <app-stat-card icon="🧑‍⚕️" [value]="stats()!.patientCount"     label="Patients"     />
+      <app-stat-card icon="👨‍⚕️" [value]="stats()!.doctorCount"      label="Médecins"     />
+      <app-stat-card icon="📅"  [value]="stats()!.appointmentCount" label="Rendez-vous"  />
+      <app-stat-card icon="🏥"  [value]="stats()!.departmentCount"  label="Départements" />
+    </div>
+
+    <div class="grid-2">
+      <div class="card" style="padding: 24px">
+        <h3 style="margin-bottom: 16px; font-size: 15px; color: var(--text-secondary); font-weight: 700;">
+          📅 Rendez-vous aujourd'hui
+        </h3>
+        <div style="font-size: 48px; font-weight: 800; color: var(--primary);">
+          {{ stats()!.todayAppointments }}
+        </div>
+        <div style="font-size: 12px; color: var(--text-light); margin-top: 4px;">rendez-vous planifiés ce jour</div>
+      </div>
+
+      <div class="card" style="padding: 24px">
+        <h3 style="margin-bottom: 16px; font-size: 15px; color: var(--text-secondary); font-weight: 700;">
+          📊 Répartition des statuts
+        </h3>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          @for (stat of stats()!.appointmentsByStatus; track stat.status) {
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span [class]="'badge badge-' + stat.status.toLowerCase()">
+                {{ statusLabel(stat.status) }}
+              </span>
+              <strong>{{ stat._count.status }}</strong>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 24px; padding: 24px">
+      <h3 style="margin-bottom: 16px; font-size: 15px; color: var(--text-secondary); font-weight: 700;">
+        🆕 Derniers patients enregistrés
+      </h3>
+      @if (stats()!.recentPatients.length === 0) {
+        <p style="color: var(--text-light); font-size: 13px;">Aucun patient enregistré.</p>
+      } @else {
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          @for (patient of stats()!.recentPatients; track patient.id) {
+            <div style="display: flex; align-items: center; gap: 12px; padding: 10px; background: var(--bg-page); border-radius: 8px;">
+              <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary-bg); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--primary); font-size: 14px;">
+                {{ patient.firstName[0] }}{{ patient.lastName[0] }}
+              </div>
+              <div>
+                <div style="font-weight: 600; font-size: 13px;">{{ patient.firstName }} {{ patient.lastName }}</div>
+                <div style="font-size: 11px; color: var(--text-light);">{{ patient.email }}</div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="card" style="margin-top: 24px; padding: 20px 24px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size: 28px;">💊</span>
+        <div>
+          <div style="font-size: 28px; font-weight: 800; color: var(--accent);">{{ stats()!.medicationCount }}</div>
+          <div style="font-size: 12px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">médicaments dans le formulaire</div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

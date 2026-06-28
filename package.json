@@ -1,0 +1,28 @@
+{
+  "name": "clinicflow",
+  "version": "1.0.0",
+  "description": "Application de gestion médicale - Projet SGBD",
+  "author": "Nicolas Wattiaux",
+  "main": "dist/main/main.js",
+  "scripts": {
+    "start": "npm run build && electron .",
+    "build:main": "tsc -p tsconfig.json",
+    "build:renderer": "npm --prefix renderer run build",
+    "build": "npm run build:renderer && npm run build:main",
+    "prisma:generate": "npx prisma generate",
+    "prisma:migrate": "npx prisma migrate dev --name init",
+    "prisma:seed": "npx ts-node --project tsconfig.seed.json prisma/seed.ts",
+    "prisma:studio": "npx prisma studio",
+    "setup": "npm install && npm --prefix renderer install && npm run prisma:migrate && npm run prisma:seed"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "electron": "^41.1.1",
+    "prisma": "^5.22.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.0"
+  }
+}

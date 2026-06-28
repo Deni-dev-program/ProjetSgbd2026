@@ -1,0 +1,88 @@
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Note: SQLite ne supporte pas les enums natifs Prisma.
+// Les valeurs de statut sont contraintes côté application : SCHEDULED | COMPLETED | CANCELLED
+
+model Department {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  doctors     Doctor[]
+  createdAt   DateTime @default(now())
+}
+
+model Doctor {
+  id           Int           @id @default(autoincrement())
+  firstName    String
+  lastName     String
+  email        String        @unique
+  phone        String?
+  departmentId Int
+  department   Department    @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+  appointments Appointment[]
+  createdAt    DateTime      @default(now())
+}
+
+model Patient {
+  id             Int             @id @default(autoincrement())
+  firstName      String
+  lastName       String
+  email          String          @unique
+  phone          String?
+  dateOfBirth    DateTime
+  address        String?
+  appointments   Appointment[]
+  medicalRecords MedicalRecord[]
+  createdAt      DateTime        @default(now())
+}
+
+model Appointment {
+  id        Int               @id @default(autoincrement())
+  patientId Int
+  doctorId  Int
+  date      DateTime
+  status    String            @default("SCHEDULED")
+  notes     String?
+  patient   Patient           @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctor    Doctor            @relation(fields: [doctorId], references: [id], onDelete: Restrict)
+  createdAt DateTime          @default(now())
+}
+
+model MedicalRecord {
+  id            Int            @id @default(autoincrement())
+  patientId     Int
+  diagnosis     String
+  notes         String?
+  recordDate    DateTime       @default(now())
+  patient       Patient        @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  prescriptions Prescription[]
+}
+
+model Medication {
+  id            Int            @id @default(autoincrement())
+  name          String         @unique
+  description   String?
+  dosageForm    String
+  prescriptions Prescription[]
+}
+
+// Table de jonction N:M entre MedicalRecord et Medication
+model Prescription {
+  medicalRecordId Int
+  medicationId    Int
+  dosage          String
+  duration        String
+  instructions    String?
+  medicalRecord   MedicalRecord @relation(fields: [medicalRecordId], references: [id], onDelete: Cascade)
+  medication      Medication    @relation(fields: [medicationId], references: [id], onDelete: Restrict)
+
+  @@id([medicalRecordId, medicationId])
+}
